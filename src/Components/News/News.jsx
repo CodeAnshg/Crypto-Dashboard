@@ -9,7 +9,7 @@ function News() {
   const fetchNews = async () => {
     try {
       let response = await fetch(
-        "https://newsapi.org/v2/everything?q=bitcoin&apiKey=f80a99286b1246baaed006606085025a"
+        "http://newsapi.org/v2/everything?q=bitcoin&apiKey=f80a99286b1246baaed006606085025a"
       );
       let result = await response.json();
       setNews(result.articles.slice(0, 4)); 
