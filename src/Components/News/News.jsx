@@ -1,26 +1,32 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './News.css';
 
 function News() {
   const [news, setNews] = useState([]);
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [isMobileView, setIsMobileView] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchNews = async () => {
+    setLoading(true);
     try {
       let response = await fetch(
-        "http://newsapi.org/v2/everything?q=bitcoin&apiKey=f80a99286b1246baaed006606085025a"
+        "https://newsapi.org/v2/everything?q=bitcoin&apiKey=f80a99286b1246baaed006606085025a"
       );
       let result = await response.json();
-      setNews(result.articles.slice(0, 4)); 
+      if (result.articles && result.articles.length > 0) {
+        setNews(result.articles.slice(0, 4));
+      }
     } catch (error) {
       console.error("Error fetching news:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
     fetchNews();
-  }, []); 
+  }, []);
 
   useEffect(() => {
     const handleResize = () => {
@@ -43,7 +49,9 @@ function News() {
   return (
     <div className="news-container">
       <h1>Keep Yourself Updated</h1>
-      {selectedArticle ? (
+      {loading ? (
+        <p>Loading news...</p>
+      ) : selectedArticle ? (
         <div className="article-detail">
           <button className="back-button" onClick={handleBackClick}>
             Back
@@ -58,27 +66,20 @@ function News() {
           </div>
         </div>
       ) : (
-        <>
-          
-          <div className={`news-grid ${isMobileView ? 'mobile-view' : 'desktop-view'}`}>
-            {news.map((item, key) => (
-              <div className="news-card" key={key} onClick={() => handleImageClick(item)}>
-                <img src={item.urlToImage} alt="article" className="news-image" />
-                <div className="card-content">
-                  <h4>{item.title}</h4>
-                  <p>{item.content}</p>
-                </div>
+        <div className={`news-grid ${isMobileView ? 'mobile-view' : 'desktop-view'}`}>
+          {news.map((item, key) => (
+            <div className="news-card" key={key} onClick={() => handleImageClick(item)}>
+              <img src={item.urlToImage} alt="article" className="news-image" />
+              <div className="card-content">
+                <h4>{item.title}</h4>
+                <p>{item.content}</p>
               </div>
-            ))}
-          </div>
-        </>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
 }
 
 export default News;
-
-
-
-
